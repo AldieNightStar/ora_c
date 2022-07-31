@@ -1,0 +1,10 @@
+use "out.c"
+
+1 ?heller
+!end
+
+heller:
+	100 print
+
+end:
+	1
