@@ -73,6 +73,11 @@ label:
 # Will add `s_math.c` from std directory
 use math
 
+# Create function
+# In fact there will be "void s_myfunc(stack)" in c
+func myfunc
+	# End up the function
+	ret
 ```
 
 # Writing API
