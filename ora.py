@@ -169,6 +169,7 @@ def c_compile_to_src(includes, funcs, stringpool):
 	sb.append(g_include("__std.c"))
 	for inc in includes:
 		sb.append(g_include("s_" + inc + ".c"))
+	sb.append("\n")
 	sb.append(src);
 
 	strings_sb = []
@@ -176,7 +177,7 @@ def c_compile_to_src(includes, funcs, stringpool):
 		strings_sb.append(g_set_string(id, stringpool[id]))
 	strings_pool_register = ''.join(strings_sb)
 
-	sb.append(g_main(f"{strings_pool_register}s_main(s);\n"))
+	sb.append(g_main(f"{strings_pool_register}s_main(s);"))
 	return "".join(sb)
 
 def c_compile(src):
@@ -207,7 +208,8 @@ def g_goto(name):
 def g_main(instructions_str):
 	s1 = "t_stacky* s = stacky_new(8192);\n"
 	s2 = "__std_init_strings();\n"
-	return f"void main(){{\n{s1}{s2}{instructions_str}\n}}\n"
+	inner = g_tab(f"{s1}{s2}{instructions_str}")
+	return f"void main(){{\n{inner}\n}}\n"
 
 def g_push(arg):
 	return f"stacky_push(s, {arg});\n"
@@ -216,7 +218,7 @@ def g_if_goto(arg):
 	return f"if (stacky_pop(s) == 1) goto {arg};\n"
 
 def g_func(name, inner):
-	return f"void s_{name}(t_stacky* s){{\n{inner}}}\n"
+	return f"void s_{name}(t_stacky* s){{\n{g_tab(inner)}}}\n"
 
 def g_push_string(arg):
 	return f"stacky_push_str(s, \"{g_esc_string(arg)}\");\n"
@@ -226,6 +228,17 @@ def g_esc_string(s):
 
 def g_set_string(id, str):
 	return f"__std_str_set({id}, \"{g_esc_string(str)}\");\n"
+
+def g_tab(str):
+	arr = str.split("\n")
+	arr2 = []
+	for a in arr:
+		s = a.strip()
+		if len(s) < 1:
+			arr2.append(s)
+			continue
+		arr2.append("\t" + s)
+	return "\n".join(arr2)
 
 # ==========================================
 # Main launcher
