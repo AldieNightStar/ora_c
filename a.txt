@@ -1,3 +1,5 @@
 use "out"
+use "math"
 
-123 print
+func main
+	32 4 mul print
