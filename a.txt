@@ -1,5 +1,8 @@
-use "out"
-use "math"
+use out
+use math
 
 func main
-	32 4 mul print
+	10 20 30 add3 print
+
+func add3
+	add add

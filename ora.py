@@ -72,7 +72,7 @@ def c_proc_analyze_includes(toks):
 			break
 		if tok.type == T_SPC and tok.value == "use":
 			name = next(it, None)
-			if name == None or name.type != T_STR: break
+			if name == None or name.type != T_SPC: break
 			name = name.value
 			incs.append(name)
 			continue
