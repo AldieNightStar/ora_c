@@ -27,6 +27,7 @@ def main(args):
 # ==========================================
 
 C_PUSH = "push"
+C_PUSH_STRING = "pushs"
 C_CALL = "call"
 C_GOTO = "goto"
 C_LABEL = "label"
@@ -34,13 +35,6 @@ C_LOGIC_GOTO = "goto?"
 
 def c_lex(src):
 	return lex(src)
-
-def c_proc_remove_strings(toks):
-	arr = []
-	for tok in toks:
-		if tok.type == T_STR: continue
-		arr.append(tok)
-	return arr
 
 def c_proc_make_calls(toks):
 	arr = []
@@ -60,6 +54,8 @@ def c_proc_make_calls(toks):
 				arr.append((C_LOGIC_GOTO, name))
 			else:
 				arr.append((C_CALL, tok.value))
+		elif tok.type == T_STR:
+			arr.append((C_PUSH_STRING, tok.value))
 	return arr
 
 def c_proc_analyze_includes(toks):
@@ -109,10 +105,6 @@ def c_compile_toks(toks):
 	# funcs: {"main": [tokens...]}
 	funcs = c_proc_analyze_funcs(toks)
 
-	# Remove string tokens
-	for name, toks in funcs.items():
-		funcs[name] = c_proc_remove_strings(toks)
-
 	# Make calls and labels from tokens
 	for name, toks in funcs.items():
 		funcs[name] = c_proc_make_calls(toks)
@@ -139,6 +131,9 @@ def c_compile_func_to_src(name, toks):
 			continue
 		elif tp == C_LABEL:
 			sb.append(g_label(arg))
+			continue
+		elif tp == C_PUSH_STRING:
+			sb.append(g_push_string(arg))
 			continue
 	return g_func(name, "".join(sb))
 
@@ -182,8 +177,9 @@ def g_goto(name):
 	return f"goto {name};\n"
 
 def g_main(instructions_str):
-	s = "t_stacky* s = stacky_new(8192);"
-	return f"void main(){{\n{s}\n{instructions_str}\n}}\n"
+	s1 = "t_stacky* s = stacky_new(8192);\n"
+	s2 = "__std_init_strings();\n"
+	return f"void main(){{\n{s1}{s2}{instructions_str}\n}}\n"
 
 def g_push(arg):
 	return f"stacky_push(s, {arg});\n"
@@ -196,6 +192,12 @@ def g_if_goto(arg):
 
 def g_func(name, inner):
 	return f"void s_{name}(t_stacky* s){{\n{inner}}}\n"
+
+def g_push_string(arg):
+	return f"stacky_push_str(s, \"{g_esc_string(arg)}\");\n"
+
+def g_esc_string(s):
+	return s.replace("\t", "\\t").replace("\n", "\\n").replace("\0", "\\0").replace("\\", "\\\\").replace("\"", "\\\"")
 
 # ==========================================
 # Main launcher

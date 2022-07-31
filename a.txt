@@ -4,4 +4,4 @@ use swaps
 use debug
 
 func main
-	1000 dump
+	"Hello world!" "Hi jack!" "Hi sir" prints prints prints
