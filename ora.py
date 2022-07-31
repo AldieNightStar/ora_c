@@ -32,6 +32,7 @@ C_CALL = "call"
 C_GOTO = "goto"
 C_LABEL = "label"
 C_LOGIC_GOTO = "goto?"
+C_RETURN = "ret"
 
 def c_lex(src):
 	return lex(src)
@@ -43,7 +44,9 @@ def c_proc_make_calls(toks):
 			arr.append((C_PUSH, int(tok.value)))
 		elif tok.type == T_SPC:
 			name = tok.value
-			if name.endswith(":"):
+			if name == "ret":
+				arr.append((C_RETURN, 0))
+			elif name.endswith(":"):
 				name = name[0:-1]
 				arr.append((C_LABEL, name))
 			elif name.startswith("!"):
@@ -134,6 +137,9 @@ def c_compile_func_to_src(name, toks):
 			continue
 		elif tp == C_PUSH_STRING:
 			sb.append(g_push_string(arg))
+			continue
+		elif tp == C_RETURN:
+			sb.append("return;\n")
 			continue
 	return g_func(name, "".join(sb))
 

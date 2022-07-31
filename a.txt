@@ -5,8 +5,20 @@ use debug
 use logic
 
 func main
-	start:
-		"This is ok" prints
-		10 10 eq not ?end
-		"not eq" prints
-	end: 1
+	20 loop:
+		dup 0 eq ?end
+		dec
+		dup printn
+		inner
+		!loop
+	end:
+		"DONE!" prints
+
+func inner
+	5 loop:
+		dup 0 eq ?end
+		dec
+		dup printn
+		!loop
+	end:
+		drop

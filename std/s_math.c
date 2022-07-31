@@ -27,3 +27,11 @@ void s_mod(t_stacky* s) {
 	int a = stacky_pop(s);
 	stacky_push(s, a%b);
 }
+
+void s_inc(t_stacky* s) {
+	stacky_push(s, stacky_pop(s)+1);
+}
+
+void s_dec(t_stacky* s) {
+	stacky_push(s, stacky_pop(s)-1);
+}
