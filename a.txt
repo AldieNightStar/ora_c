@@ -1,8 +1,7 @@
 use out
 use math
+use swaps
+use debug
 
 func main
-	10 20 30 add3 print
-
-func add3
-	add add
+	1000 dump

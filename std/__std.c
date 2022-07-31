@@ -35,3 +35,16 @@ int stacky_pop(t_stacky* st) {
 	}
 	return st->data[--st->ptr];
 }
+
+void s_swap(t_stacky* st) {
+	int a = stacky_pop(st);
+	int b = stacky_pop(st);
+	stacky_push(st, a);
+	stacky_push(st, b);
+}
+
+void s_dup(t_stacky* st) {
+	int a = stacky_pop(st);
+	stacky_push(st, a);
+	stacky_push(st, a);
+}

@@ -149,11 +149,9 @@ def c_compile_to_src(includes, funcs):
 	src = "".join(sb)
 	sb = []
 	sb.append(g_include("stdlib.h"))
-	sb.append(g_include("stacky.c"))
-	sb.append("// Imports\n")
+	sb.append(g_include("__std.c"))
 	for inc in includes:
 		sb.append(g_include("s_" + inc + ".c"))
-	sb.append("// " + ("="*16) + "\n\n")
 	sb.append(src);
 	sb.append(g_main("s_main(s);\n"))
 	return "".join(sb)
