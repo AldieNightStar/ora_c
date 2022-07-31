@@ -4,7 +4,6 @@ from lex import lex, T_STR, T_SPC, T_NUM
 import os
 import sys
 import subprocess
-import random
 
 scriptDirectory = os.path.dirname(os.path.realpath(__file__))
 
@@ -118,10 +117,10 @@ def c_compile_to_src(toks, includes):
 	src = "".join(sb)
 	sb = []
 	sb.append(g_include("stdlib.h"))
-	sb.append(g_std())
+	sb.append(g_include("stacky.c"))
 	sb.append("// Imports\n")
 	for inc in includes:
-		sb.append(g_include(inc))
+		sb.append(g_include("s_" + inc + ".c"))
 	sb.append("// " + ("="*16) + "\n\n")
 	sb.append(g_main(src))
 	return "".join(sb)
@@ -138,10 +137,6 @@ def c_compile(src):
 # ==========================================
 
 g_callback_def = "typedef void (*sfunc)(t_stacky*);\n"
-
-def g_std():
-	with open(scriptDirectory+"/std/stacky.c") as f:
-		return f.read() + "\n\n"
 
 def g_include(name):
 	return f"#include <{name}>\n"
