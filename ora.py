@@ -177,7 +177,7 @@ def c_compile_to_src(includes, funcs, stringpool):
 		strings_sb.append(g_set_string(id, stringpool[id]))
 	strings_pool_register = ''.join(strings_sb)
 
-	sb.append(g_main(f"{strings_pool_register}s_main(s);"))
+	sb.append(g_main(f"__std_init_strings({len(stringpool)});\n{strings_pool_register}\ns_main(s);"))
 	return "".join(sb)
 
 def c_compile(src):
@@ -207,8 +207,7 @@ def g_goto(name):
 
 def g_main(instructions_str):
 	s1 = "t_stacky* s = stacky_new(8192);\n"
-	s2 = "__std_init_strings();\n"
-	inner = g_tab(f"{s1}{s2}{instructions_str}")
+	inner = g_tab(f"{s1}{instructions_str}")
 	return f"void main(){{\n{inner}\n}}\n"
 
 def g_push(arg):

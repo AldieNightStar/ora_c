@@ -65,17 +65,19 @@ void s_drop(t_stacky* st) {
 // ========= STRINGS (INT) ============
 
 char** __std_strings;
+int __std_strings_size;
 
-void __std_init_strings() {
-	__std_strings = malloc(sizeof(char*) * __std_def_size);
+void __std_init_strings(int size) {
+	__std_strings = malloc(sizeof(char*) * size);
+	__std_strings_size = size;
 }
 
 char* __std_str_get(int id) {
-	if (id < 0 || id >= __std_def_size) return "{STRING_OUT_RANGE}";
+	if (id < 0 || id >= __std_strings_size) return "{STRING_OUT_RANGE}";
 	return __std_strings[id];
 }
 
 void __std_str_set(int id, char* s) {
-	if (id < 0 || id >= __std_def_size) return;
+	if (id < 0 || id >= __std_strings_size) return;
 	__std_strings[id] = s;
 }
