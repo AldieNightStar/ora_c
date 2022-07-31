@@ -33,10 +33,6 @@ int stacky_push(t_stacky* st, int dat) {
 	return 1;
 }
 
-int stacky_push_str(t_stacky* st, char* str) {
-	return stacky_push(st, __std_reg_str(str));
-}
-
 int stacky_pop(t_stacky* st) {
 	if (st->ptr < 1) {
 		return 0;
@@ -69,18 +65,17 @@ void s_drop(t_stacky* st) {
 // ========= STRINGS (INT) ============
 
 char** __std_strings;
-int __std_strings_ptr = 0;
 
 void __std_init_strings() {
 	__std_strings = malloc(sizeof(char*) * __std_def_size);
 }
 
-int __std_reg_str(char* str) {
-	__std_strings[__std_strings_ptr] = str;
-	return __std_strings_ptr++;
-}
-
 char* __std_str_get(int id) {
 	if (id < 0 || id >= __std_def_size) return "{STRING_OUT_RANGE}";
 	return __std_strings[id];
+}
+
+void __std_str_set(int id, char* s) {
+	if (id < 0 || id >= __std_def_size) return;
+	__std_strings[id] = s;
 }

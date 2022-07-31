@@ -1,6 +1,6 @@
 #!/bin/env python
 
-from lex import lex, T_STR, T_SPC, T_NUM
+from lex import lex, T_STR, T_SPC, T_NUM, Token
 import os
 import sys
 import subprocess
@@ -61,6 +61,20 @@ def c_proc_make_calls(toks):
 			arr.append((C_PUSH_STRING, tok.value))
 	return arr
 
+def c_proc_analyze_string_pool(toks):
+	strings = []
+	arr = []
+	for tok in toks:
+		if tok.type == T_STR:
+			if tok.value in strings:
+				arr.append(Token(T_NUM, strings.index(tok.value), 0))
+			else:
+				strings.append(tok.value)
+				arr.append(Token(T_NUM, len(strings)-1, 0))
+			continue
+		arr.append(tok)
+	return arr, strings
+
 def c_proc_analyze_includes(toks):
 	it = iter(toks)
 	arr = []
@@ -105,6 +119,8 @@ def c_compile_toks(toks):
 	# Import c files
 	toks, includes = c_proc_analyze_includes(toks)
 
+	toks, stringpool = c_proc_analyze_string_pool(toks)
+
 	# funcs: {"main": [tokens...]}
 	funcs = c_proc_analyze_funcs(toks)
 
@@ -112,7 +128,7 @@ def c_compile_toks(toks):
 	for name, toks in funcs.items():
 		funcs[name] = c_proc_make_calls(toks)
 
-	return includes, funcs
+	return includes, funcs, stringpool
 
 def c_compile_func_to_src(name, toks):
 	sb = []
@@ -143,7 +159,7 @@ def c_compile_func_to_src(name, toks):
 			continue
 	return g_func(name, "".join(sb))
 
-def c_compile_to_src(includes, funcs):
+def c_compile_to_src(includes, funcs, stringpool):
 	sb = []
 	for name, toks in funcs.items():
 		sb.append(c_compile_func_to_src(name, toks))
@@ -154,13 +170,19 @@ def c_compile_to_src(includes, funcs):
 	for inc in includes:
 		sb.append(g_include("s_" + inc + ".c"))
 	sb.append(src);
-	sb.append(g_main("s_main(s);\n"))
+
+	strings_sb = []
+	for id in range(len(stringpool)):
+		strings_sb.append(g_set_string(id, stringpool[id]))
+	strings_pool_register = ''.join(strings_sb)
+
+	sb.append(g_main(f"{strings_pool_register}s_main(s);\n"))
 	return "".join(sb)
 
 def c_compile(src):
 	toks = c_lex(src)
-	includes, funcs = c_compile_toks(toks)
-	new_src = c_compile_to_src(includes, funcs)
+	includes, funcs, stringpool = c_compile_toks(toks)
+	new_src = c_compile_to_src(includes, funcs, stringpool)
 	return new_src
 
 
@@ -200,7 +222,10 @@ def g_push_string(arg):
 	return f"stacky_push_str(s, \"{g_esc_string(arg)}\");\n"
 
 def g_esc_string(s):
-	return s.replace("\t", "\\t").replace("\n", "\\n").replace("\0", "\\0").replace("\\", "\\\\").replace("\"", "\\\"")
+	return s.replace("\\", "\\\\").replace("\t", "\\t").replace("\n", "\\n").replace("\0", "\\0").replace("\"", "\\\"")
+
+def g_set_string(id, str):
+	return f"__std_str_set({id}, \"{g_esc_string(str)}\");\n"
 
 # ==========================================
 # Main launcher
