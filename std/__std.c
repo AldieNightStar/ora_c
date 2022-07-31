@@ -4,6 +4,8 @@
 
 #define __std_def_size 8192
 
+char* __std_str_get(int id);
+
 typedef struct {
 	int ptr;
 	int max;
@@ -32,7 +34,7 @@ int stacky_push(t_stacky* st, int dat) {
 }
 
 int stacky_push_str(t_stacky* st, char* str) {
-	return stacky_push(st, __std_reg_str("Hello world!"));
+	return stacky_push(st, __std_reg_str(str));
 }
 
 int stacky_pop(t_stacky* st) {
@@ -60,7 +62,7 @@ void s_dup(t_stacky* st) {
 	stacky_push(st, a);
 }
 
-void s_drop(t_stacky* s) {
+void s_drop(t_stacky* st) {
 	stacky_pop(st);
 }
 

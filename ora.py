@@ -19,7 +19,7 @@ def main(args):
 		src = c_compile(f.read())
 		with open(outname + ".c", 'w') as o:
 			o.write(src)
-	subprocess.Popen(["gcc", "-O3", "-I", scriptDirectory+"/std", "-o", outname, outname+".c"]).wait()
+	subprocess.Popen(["gcc", "-w", "-O3", "-I", scriptDirectory+"/std", "-o", outname, outname+".c"]).wait()
 	subprocess.Popen(["strip", outname]).wait()
 
 # ==========================================
@@ -185,10 +185,7 @@ def g_push(arg):
 	return f"stacky_push(s, {arg});\n"
 
 def g_if_goto(arg):
-	sb = []
-	sb.append("int exnum = stacky_pop(s); ")
-	sb.append(f"if (exnum == 1) goto {arg};\n")
-	return "".join(sb)
+	return f"if (stacky_pop(s) == 1) goto {arg};\n"
 
 def g_func(name, inner):
 	return f"void s_{name}(t_stacky* s){{\n{inner}}}\n"

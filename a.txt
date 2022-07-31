@@ -2,6 +2,11 @@ use out
 use math
 use swaps
 use debug
+use logic
 
 func main
-	"Hello world!" "Hi jack!" "Hi sir" prints prints prints
+	start:
+		"This is ok" prints
+		10 10 eq not ?end
+		"not eq" prints
+	end: 1
